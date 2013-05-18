@@ -10,6 +10,10 @@
 	},
 	"license": "MIT",
 	"dependencies": {
+		"requirejs": "2.x"
+	},
+	"scripts": {
+		"prepublish": "git submodule update --init"
 	},
 	"keywords": [
 		"amd"
