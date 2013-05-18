@@ -1,0 +1,7 @@
+[
+    {
+        "name": "r.js",
+        "url": "git://github.com/jrburke/r.js.git",
+        "commit": "2.1.6"
+    }
+]
