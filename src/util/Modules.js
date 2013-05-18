@@ -3,7 +3,33 @@
 var fs = require('fs');
 var path = require('path');
 
+var map = require('mout/collection/map');
+
 var Modules = {};
+
+
+//transformed paths (have 'paths' or 'packages' entries in rjsconfig)
+var _transforms = function(rjsconfig) {
+	var paths = rjsconfig.paths || [];
+	var packages = rjsconfig.packages || [];
+
+	return map(paths, function(val, key) {
+		return {
+			from: val,
+			to: key
+		};
+	})
+		.concat(packages.map(function(pkg) {
+			return {
+				from: pkg.location,
+				to: pkg.name
+			};
+		}))
+		.sort(function(a, b) {
+			//transform in order from most complex to simplest
+			return a.from.length < b.from.length;
+		});
+};
 
 
 Modules.getId = function(filePath, rjsconfig) {
@@ -19,26 +45,7 @@ Modules.getId = function(filePath, rjsconfig) {
 	var relativePath = path.relative(baseDirectory, absolutePath);
 
 	//combine all path transformation operations together
-	var paths = rjsconfig.paths || [];
-	var packages = rjsconfig.packages || [];
-	var transforms = _.map(paths, function(val, key) {
-		return {
-			from: val,
-			to: key
-		};
-	}).concat(packages.map(function(pkg) {
-	return {
-		from: pkg.location,
-		to: pkg.name
-	};
-	}));
-
-	_.chain(transforms)
-	.sortBy(function(obj) {
-		//transform in order from most complex to simplest
-		return -1 * obj.from.length;
-	})
-	.every(function(obj) {
+	_transforms(rjsconfig).every(function(obj) {
 		if (relativePath.search(obj.from) !== -1) {
 			relativePath = relativePath.replace(obj.from, obj.to);
 			return false;
@@ -74,29 +81,10 @@ Modules.getFile = function(declaredName, directory, rjsconfig) {
 		return candidate;
 	}
 
-	//transformed paths (have 'paths' or 'packages' entries in rjsconfig)
-	var paths = rjsconfig.paths || [];
-	var packages = rjsconfig.packages || [];
-	var transforms = _.map(paths, function(val, key) {
-		return {
-			from: key,
-			to: val
-		};
-	}).concat(packages.map(function(pkg) {
-		return {
-			from: pkg.name,
-			to: pkg.location
-		};
-	}));
-
 	var result;
 
-	_.chain(transforms)
-	.sortBy(function(obj) {
-		//transform in order from most complex to simplest
-		return -1 * obj.from.length;
-	})
-	.every(function(obj) {
+	//transformed paths
+	_transforms(rjsconfig).every(function(obj) {
 		var candidate = declaredName;
 		if (candidate.search(obj.from) !== -1) {
 			candidate = candidate.replace(obj.from, obj.to);
@@ -114,16 +102,17 @@ Modules.getFile = function(declaredName, directory, rjsconfig) {
 	}
 
 	//try CommonJS Packages directory structure
+	var packages = rjsconfig.packages || [];
 	result = packages
-	.filter(function(pkg) {
-		return pkg.name === declaredName;
-	})
-	.map(function(pkg) {
-		return path.resolve(process.cwd(), rjsconfig.baseUrl, pkg.location, pkg.main || 'main');
-	})
-	.filter(function(path) {
-		return fs.existsSync(path) || fs.existsSync(path + '.js');
-	})[0];
+		.filter(function(pkg) {
+			return pkg.name === declaredName;
+		})
+		.map(function(pkg) {
+			return path.resolve(process.cwd(), rjsconfig.baseUrl, pkg.location, pkg.main || 'main');
+		})
+		.filter(function(path) {
+			return fs.existsSync(path) || fs.existsSync(path + '.js');
+		})[0];
 
 	if (result) {
 		return result;

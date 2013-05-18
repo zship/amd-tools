@@ -10,7 +10,8 @@
 	},
 	"license": "MIT",
 	"dependencies": {
-		"requirejs": "2.x"
+		"requirejs": "2.x",
+		"mout": "0.x"
 	},
 	"scripts": {
 		"prepublish": "git submodule update --init"
