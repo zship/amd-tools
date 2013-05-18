@@ -3,8 +3,6 @@
 var fs = require('fs');
 var path = require('path');
 
-var map = require('mout/collection/map');
-
 var Modules = {};
 
 
@@ -13,10 +11,10 @@ var _transforms = function(rjsconfig) {
 	var paths = rjsconfig.paths || [];
 	var packages = rjsconfig.packages || [];
 
-	return map(paths, function(val, key) {
+	return Object.keys(paths).map(function(key) {
 		return {
-			from: val,
-			to: key
+			from: key,
+			to: paths[key]
 		};
 	})
 		.concat(packages.map(function(pkg) {
@@ -38,10 +36,10 @@ Modules.getId = function(filePath, rjsconfig) {
 
 	//passed a relative path
 	if (!fs.existsSync(filePath)) {
-		absolutePath = path.resolve(process.cwd() + '/' + filePath);
+		absolutePath = path.resolve(process.cwd(), filePath);
 	}
 
-	var baseDirectory = path.resolve(process.cwd() + '/' + baseUrl);
+	var baseDirectory = path.resolve(process.cwd(), baseUrl);
 	var relativePath = path.relative(baseDirectory, absolutePath);
 
 	//combine all path transformation operations together
@@ -75,7 +73,7 @@ Modules.getFile = function(declaredName, directory, rjsconfig) {
 	}
 
 	//non-transformed paths
-	candidate = path.resolve(process.cwd() + '/' + rjsconfig.baseUrl + '/' + declaredName + '.js');
+	candidate = path.resolve(rjsconfig.baseUrl, declaredName + '.js');
 
 	if (fs.existsSync(candidate)) {
 		return candidate;
@@ -88,7 +86,7 @@ Modules.getFile = function(declaredName, directory, rjsconfig) {
 		var candidate = declaredName;
 		if (candidate.search(obj.from) !== -1) {
 			candidate = candidate.replace(obj.from, obj.to);
-			candidate = path.resolve(process.cwd() + '/' + rjsconfig.baseUrl + '/' + candidate + '.js');
+			candidate = path.resolve(rjsconfig.baseUrl, candidate + '.js');
 			if (fs.existsSync(candidate)) {
 				result = candidate;
 				return false;
@@ -108,7 +106,7 @@ Modules.getFile = function(declaredName, directory, rjsconfig) {
 			return pkg.name === declaredName;
 		})
 		.map(function(pkg) {
-			return path.resolve(process.cwd(), rjsconfig.baseUrl, pkg.location, pkg.main || 'main');
+			return path.resolve(rjsconfig.baseUrl, pkg.location, pkg.main || 'main');
 		})
 		.filter(function(path) {
 			return fs.existsSync(path) || fs.existsSync(path + '.js');
@@ -120,8 +118,12 @@ Modules.getFile = function(declaredName, directory, rjsconfig) {
 
 	//path in current directory without a leading './'
 	result = path.normalize(directory + '/' + declaredName + '.js');
-	return result;
 
+	if (fs.existsSync(result)) {
+		return result;
+	}
+
+	return undefined;
 };
 
 
