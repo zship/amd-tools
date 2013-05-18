@@ -110,34 +110,31 @@ Cycles.longestCommonSublist = function(first, second) {
 };
 
 
-Cycles.grouped = function(loops, worstAcceptableLength) {
-	worstAcceptableLength = worstAcceptableLength || 3;
-	var groups = {};
+/**
+ * If one cycle fully contains another cycle
+ */
+Cycles.contains = function(first, second) {
+	var smaller = first;
+	var larger = second;
 
-	for (var i = 0; i < loops.length; i++) {
-		var first = loops[i];
-		for (var j = 0; j < loops.length; j++) {
-			if (i === j) {
-				continue;
+	if (first.length > second.length) {
+		smaller = second;
+		larger = first;
+	}
+
+	for (var i = 0; i < larger.length; i++) {
+		var rotated = Cycles.rotated(larger, i);
+		for (var j = 0; j < smaller.length; j++) {
+			if (smaller[j] !== rotated[j]) {
+				break;
 			}
-
-			var second = loops[j];
-			var commonSublist = Cycles.longestCommonSublist(first, second);
-
-			if (commonSublist.length < worstAcceptableLength) {
-				continue;
+			else if (j === smaller.length - 1) {
+				return true;
 			}
-
-			var key = commonSublist.join(',');
-			groups[key] = groups[key] || [];
-			groups[key].push(first);
-			groups[key].push(second);
 		}
 	}
 
-	return map(groups, function(loops) {
-		return Cycles.unique(loops);
-	});
+	return false;
 };
 
 
