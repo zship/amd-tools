@@ -68,34 +68,38 @@ var findBrokenDependencies = function(pool, rjsconfig) {
 					}
 					catch(e) {
 						return {
+							parent: file,
 							declared: declaredName,
 							resolved: false,
 							type: 'plugin',
-							name: pluginName,
-							args: pluginArgs
+							pluginName: pluginName,
+							pluginArgs: pluginArgs
 						};
 					}
 
 					if (!_pluginCanLoad(plugin, pluginArgs)) {
 						return {
+							parent: file,
 							declared: declaredName,
 							resolved: false,
 							type: 'args',
-							name: pluginName,
-							args: pluginArgs
+							pluginName: pluginName,
+							pluginArgs: pluginArgs
 						};
 					}
 
 					return {
+						parent: file,
 						declared: declaredName,
 						resolved: Modules.getFile(pluginName, path.dirname(file), rjsconfig),
 						type: 'plugin',
-						name: pluginName,
-						args: pluginArgs
+						pluginName: pluginName,
+						pluginArgs: pluginArgs
 					};
 				}
 
 				return {
+					parent: file,
 					declared: declaredName,
 					resolved: Modules.getFile(declaredName, path.dirname(file), rjsconfig),
 					type: 'module'
