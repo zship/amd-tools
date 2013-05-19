@@ -20,21 +20,30 @@ Cycles.rotated = function(cycle, i) {
 };
 
 
+Cycles.rotateUntil = function(cycle, callback) {
+	var ret = cycle.slice();
+	var i = 0;
+	while (!callback(ret) && i < cycle.length) {
+		ret = Cycles.rotated(cycle, i);
+		i++;
+	}
+	return ret;
+};
+
+
 var _equal = function(first, second) {
-	return JSON.stringify(first) === JSON.stringify(second);
-/*
- *    if (first.length !== second.length) {
- *        return false;
- *    }
- *
- *    for (var i = 0; i < first.length; i++) {
- *        if (!deepEquals(first[i], second[i])) {
- *            return false;
- *        }
- *    }
- *
- *    return true;
- */
+	//return JSON.stringify(first) === JSON.stringify(second);
+	if (first.length !== second.length) {
+		return false;
+	}
+
+	for (var i = 0; i < first.length; i++) {
+		if (!deepEquals(first[i], second[i])) {
+			return false;
+		}
+	}
+
+	return true;
 };
 
 

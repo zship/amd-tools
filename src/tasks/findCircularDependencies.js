@@ -9,9 +9,13 @@ var Cycles = require('../util/Cycles');
 
 
 var _getResolvedDependencies = function(file, rjsconfig) {
-	return getDependencies(file).map(function(dep) {
-		return Modules.getFile(dep, path.dirname(file), rjsconfig);
-	});
+	return getDependencies(file)
+		.filter(function(dep) {
+			return dep !== 'require';
+		})
+		.map(function(dep) {
+			return Modules.getFile(dep, path.dirname(file), rjsconfig);
+		});
 };
 
 
@@ -38,8 +42,14 @@ var findCircularDependencies = function(pool, rjsconfig, depCache) {
 		}
 		graphPath.push(file);
 
+		/*
+		 *if (file === undefined) {
+		 *    throw new Error('Error while walking dependency graph: ' + graphPath.join(' -> ') + ': Unresolvable file.');
+		 *}
+		 */
+
 		if (depCache[file] === undefined) {
-			depCache[file] = _getResolvedDependencies(file);
+			depCache[file] = _getResolvedDependencies(file, rjsconfig);
 		}
 
 		depCache[file].forEach(function(dep) {
