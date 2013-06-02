@@ -6,7 +6,7 @@ var path = require('path');
 var requirejs = require('requirejs');
 
 requirejs.config({
-	baseUrl: path.resolve(__dirname, '../../lib/rjs'),
+	baseUrl: path.resolve(__dirname, '../components/r.js/build/jslib'),
 	nodeRequire: require
 });
 var parse = requirejs('parse');
