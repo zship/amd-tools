@@ -3,7 +3,7 @@
 
 var fs = require('fs');
 var path = require('path');
-var requirejs = require('requirejs');
+var requirejs = require('../components/r.js/dist/r.js');
 
 requirejs.config({
 	baseUrl: path.resolve(__dirname, '../components/r.js/build/jslib'),

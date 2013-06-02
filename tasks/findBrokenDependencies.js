@@ -2,7 +2,7 @@
 
 
 var path = require('path');
-var requirejs = require('requirejs');
+var requirejs = require('../components/r.js/dist/r.js');
 
 var getDependencies = require('./getDependencies');
 var requireWith = require('../util/requireWith');

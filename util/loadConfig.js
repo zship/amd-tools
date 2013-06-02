@@ -3,7 +3,7 @@
 
 var fs = require('fs');
 var path = require('path');
-var requirejs = require('requirejs');
+var requirejs = require('../components/r.js/dist/r.js');
 var mixin = require('mout/object/deepMixIn');
 
 requirejs.config({

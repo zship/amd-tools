@@ -1,7 +1,7 @@
 'use strict';
 
 
-var requirejs = require('requirejs');
+var requirejs = require('../components/r.js/dist/r.js');
 
 
 var requireWith = function(moduleName, config) {
