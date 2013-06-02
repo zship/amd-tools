@@ -10,11 +10,15 @@
 	},
 	"license": "MIT",
 	"dependencies": {
-		"requirejs": "2.x",
+		"npm-gitdeps": "0.1.x",
 		"mout": "0.x"
 	},
+	"gitDependencies": {
+		"jrburke/r.js": "2.x"
+	},
 	"scripts": {
-		"prepublish": "git submodule update --init"
+		"install": "./node_modules/npm-gitdeps/run",
+		"update": "./node_modules/npm-gitdeps/run"
 	},
 	"keywords": [
 		"amd"
