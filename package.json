@@ -1,7 +1,7 @@
 {
 	"name": "amd-tools",
 	"description": "Diagnostic tools for projects using AMD modules",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"homepage": "https://github.com/zship/amd-tools",
 	"author": "Zach Shipley <zach@zachshipley.com>",
 	"repository": {

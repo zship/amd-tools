@@ -36,16 +36,16 @@ Modules.getId = function(filePath, rjsconfig) {
 
 	//passed a relative path
 	if (!fs.existsSync(filePath)) {
-		absolutePath = path.resolve(process.cwd(), filePath);
+		absolutePath = path.resolve(filePath);
 	}
 
-	var baseDirectory = path.resolve(process.cwd(), baseUrl);
+	var baseDirectory = path.resolve(baseUrl);
 	var relativePath = path.relative(baseDirectory, absolutePath);
 
 	//combine all path transformation operations together
 	_transforms(rjsconfig).every(function(obj) {
-		if (relativePath.search(obj.from) !== -1) {
-			relativePath = relativePath.replace(obj.from, obj.to);
+		if (relativePath.search(obj.to) !== -1) {
+			relativePath = relativePath.replace(obj.to, obj.from);
 			return false;
 		}
 		return true;
@@ -65,7 +65,7 @@ Modules.getFile = function(declaredName, directory, rjsconfig) {
 		candidate = path.normalize(directory + '/' + declaredName + '.js');
 
 		if (fs.existsSync(candidate)) {
-			return candidate;
+			return path.resolve(candidate);
 		}
 		else {
 			return undefined;
@@ -120,7 +120,7 @@ Modules.getFile = function(declaredName, directory, rjsconfig) {
 	result = path.normalize(directory + '/' + declaredName + '.js');
 
 	if (fs.existsSync(result)) {
-		return result;
+		return path.resolve(result);
 	}
 
 	return undefined;
