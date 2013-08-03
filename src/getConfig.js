@@ -10,7 +10,13 @@ define(function(require) {
 
 
 	var getConfig = function(file, opts) {
-		var contents = fs.readFileSync(file, 'utf8');
+		var contents;
+		if (fs.existsSync(file)) {
+			contents = fs.readFileSync(file, 'utf8');
+		}
+		else {
+			contents = file;
+		}
 
 		try {
 			return JSON.parse(contents);
