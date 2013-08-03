@@ -1,7 +1,7 @@
 {
 	"name": "amd-tools",
 	"description": "Diagnostic tools for projects using AMD modules",
-	"version": "0.2.1",
+	"version": "1.0.0-alpha",
 	"homepage": "https://github.com/zship/amd-tools",
 	"author": "Zach Shipley <zach@zachshipley.com>",
 	"repository": {
@@ -10,15 +10,11 @@
 	},
 	"license": "MIT",
 	"dependencies": {
-		"npm-gitdeps": "0.1.x",
-		"mout": "0.x"
+		"mout": "0.x",
+		"esprima": "1.x"
 	},
-	"gitDependencies": {
-		"jrburke/r.js": "2.x"
-	},
-	"scripts": {
-		"install": "./node_modules/npm-gitdeps/run",
-		"update": "./node_modules/npm-gitdeps/run"
+	"devDependencies": {
+		"umdify": "0.x"
 	},
 	"keywords": [
 		"amd"
