@@ -23,9 +23,15 @@ define(function(require) {
 		}
 		catch(e) {}
 
-		var ast = esprima.parse(contents, {
-			range: true
-		});
+		var ast;
+		try {
+			ast = esprima.parse(contents, {
+				range: true
+			});
+		}
+		catch(e) {
+			throw new Error('Could not parse AMD config "' + contents.substring(0, 20) + '"');
+		}
 
 		var node = getCfg(ast);
 
