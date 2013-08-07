@@ -16,7 +16,12 @@ define(function(require) {
 			if (fs.existsSync(config)) {
 				cwd = path.dirname(config);
 			}
-			config = getConfig(config);
+			try {
+				config = getConfig(config);
+			}
+			catch (e) {
+				throw new Error('getConfig could not load AMD config "' + config + '"');
+			}
 		}
 
 		if (!config.mainConfigFile) {

@@ -5,8 +5,31 @@ define(function(require) {
 
 
 	var fs = require('fs');
+
 	var esprima = require('esprima');
+	var map = require('mout/object/map');
+	var isArray = require('mout/lang/isArray');
+
 	var getCfg = require('./ast/getConfig');
+
+
+	var _normalize = function(config) {
+		if (!config || !config.shim) {
+			return config;
+		}
+
+		config.shim = map(config.shim, function(val) {
+			if (isArray(val)) {
+				return {
+					deps: val,
+					exports: undefined
+				};
+			}
+			return val;
+		});
+
+		return config;
+	};
 
 
 	var getConfig = function(file, opts) {
@@ -19,7 +42,7 @@ define(function(require) {
 		}
 
 		try {
-			return JSON.parse(contents);
+			return _normalize(JSON.parse(contents));
 		}
 		catch(e) {}
 
@@ -30,7 +53,7 @@ define(function(require) {
 			});
 		}
 		catch(e) {
-			throw new Error('Could not parse AMD config "' + contents.substring(0, 20) + '"');
+			throw new Error('Could not parse AMD config "' + contents + '"');
 		}
 
 		var node = getCfg(ast);
@@ -40,7 +63,7 @@ define(function(require) {
 		}
 
 		var config = contents.substring(node.range[0], node.range[1]);
-		return eval('(' + config + ')');
+		return _normalize(eval('(' + config + ')'));
 	};
 
 

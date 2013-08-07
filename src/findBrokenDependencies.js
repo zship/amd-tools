@@ -4,10 +4,9 @@ define(function(require) {
 
 
 	var path = require('path');
-	var requirejs = require('requirejs');
 
 	var getDependencies = require('./getDependencies');
-	var getFile = require('../modules/getFile');
+	var getFile = require('./modules/getFile');
 
 
 	var _getPlugin = function(pluginName, dir, rjsconfig) {

@@ -12,7 +12,7 @@ define(function(require) {
 
 
 	var _getResolvedDependencies = function(file, rjsconfig) {
-		return getDependencies(file)
+		return getDependencies(file, rjsconfig)
 			.filter(function(dep) {
 				return dep !== 'require';
 			})

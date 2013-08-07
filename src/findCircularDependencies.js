@@ -6,17 +6,17 @@ define(function(require) {
 	var path = require('path');
 
 	var getDependencies = require('./getDependencies');
-	var Modules = require('../util/Modules');
-	var Cycles = require('../util/Cycles');
+	var getFile = require('./modules/getFile');
+	var unique = require('./cycles/unique');
 
 
 	var _getResolvedDependencies = function(file, rjsconfig) {
-		return getDependencies(file)
+		return getDependencies(file, rjsconfig)
 			.filter(function(dep) {
 				return dep !== 'require';
 			})
 			.map(function(dep) {
-				return Modules.getFile(dep, path.dirname(file), rjsconfig);
+				return getFile(dep, path.dirname(file), rjsconfig);
 			});
 	};
 
@@ -43,8 +43,11 @@ define(function(require) {
 			}
 			graphPath.push(file);
 
-			if (depCache[file] === undefined) {
-				depCache[file] = _getResolvedDependencies(file, rjsconfig);
+			try {
+				depCache[file] = depCache[file] || _getResolvedDependencies(file, rjsconfig);
+			}
+			catch (e) {
+				throw new Error('Error getting dependencies for "' + file + '":\n' + e.message);
 			}
 
 			depCache[file].forEach(function(dep) {
@@ -56,7 +59,7 @@ define(function(require) {
 			collectCircular(file, []);
 		});
 
-		return Cycles.unique(found);
+		return unique(found);
 	};
 
 
