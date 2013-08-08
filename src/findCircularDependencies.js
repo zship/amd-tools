@@ -6,7 +6,7 @@ define(function(require) {
 	var path = require('path');
 
 	var getDependencies = require('./getDependencies');
-	var getFile = require('./modules/getFile');
+	var resolve = require('./modules/resolve');
 	var unique = require('./cycles/unique');
 
 
@@ -16,7 +16,7 @@ define(function(require) {
 				return dep !== 'require';
 			})
 			.map(function(dep) {
-				return getFile(dep, path.dirname(file), rjsconfig);
+				return resolve(dep, path.dirname(file), rjsconfig);
 			});
 	};
 

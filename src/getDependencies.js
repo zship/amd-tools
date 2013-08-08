@@ -9,7 +9,7 @@ define(function(require) {
 	var get = require('mout/object/get');
 
 	var getDeps = require('./ast/getDependencies');
-	var getName = require('./modules/getName');
+	var normalize = require('./modules/normalize');
 
 
 	var getDependencies = function(file, rjsconfig) {
@@ -23,7 +23,7 @@ define(function(require) {
 		}
 		catch (e) {
 			//if it's shimmed, consider it a valid module and use shim deps
-			var id = getName(file, rjsconfig);
+			var id = normalize(file, rjsconfig);
 			deps = get(rjsconfig, 'shim.' + id + '.deps') || [];
 		}
 

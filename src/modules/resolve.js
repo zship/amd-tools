@@ -8,7 +8,12 @@ define(function(require) {
 	var _transforms = require('./_transforms');
 
 
-	var getFile = function(declaredName, directory, rjsconfig) {
+	var resolve = function(declaredName, directory, rjsconfig) {
+		//already absolute, return
+		if (declaredName.indexOf('/') === 0) {
+			return declaredName;
+		}
+
 		declaredName = declaredName.replace(/\.js/, '');
 
 		//relative paths
@@ -50,6 +55,6 @@ define(function(require) {
 	};
 
 
-	return getFile;
+	return resolve;
 
 });

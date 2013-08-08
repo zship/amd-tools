@@ -3,22 +3,20 @@ define(function(require) {
 	'use strict';
 
 
-	var fs = require('fs');
 	var path = require('path');
 	var _transforms = require('./_transforms');
+	var resolve = require('./resolve');
 
 
-	var getName = function(filePath, rjsconfig) {
+	var normalize = function(file, rjsconfig) {
 		var baseUrl = rjsconfig.baseUrl;
-		var absolutePath = path.normalize(filePath);
 
-		//passed a relative path
-		if (!fs.existsSync(filePath)) {
-			absolutePath = path.resolve(filePath);
+		if (file.indexOf('/') !== 0) {
+			file = resolve(file);
 		}
 
 		var baseDirectory = path.resolve(baseUrl);
-		var relativePath = path.relative(baseDirectory, absolutePath);
+		var relativePath = path.relative(baseDirectory, file);
 
 		//combine all path transformation operations together
 		_transforms(rjsconfig).every(function(obj) {
@@ -33,6 +31,6 @@ define(function(require) {
 	};
 
 
-	return getName;
+	return normalize;
 
 });

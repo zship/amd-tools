@@ -6,11 +6,11 @@ define(function(require) {
 	var path = require('path');
 
 	var getDependencies = require('./getDependencies');
-	var getFile = require('./modules/getFile');
+	var resolve = require('./modules/resolve');
 
 
 	var _getPlugin = function(pluginName, dir, rjsconfig) {
-		var file = getFile(pluginName, dir, rjsconfig);
+		var file = resolve(pluginName, dir, rjsconfig);
 		var plugin = require(file);
 
 		if (!plugin || !plugin.load) {
@@ -83,7 +83,7 @@ define(function(require) {
 					return {
 						parent: file,
 						declared: declaredName,
-						resolved: getFile(pluginName, path.dirname(file), rjsconfig),
+						resolved: resolve(pluginName, path.dirname(file), rjsconfig),
 						type: 'plugin',
 						pluginName: pluginName,
 						pluginArgs: pluginArgs
@@ -93,7 +93,7 @@ define(function(require) {
 				return {
 					parent: file,
 					declared: declaredName,
-					resolved: getFile(declaredName, path.dirname(file), rjsconfig),
+					resolved: resolve(declaredName, path.dirname(file), rjsconfig),
 					type: 'module'
 				};
 			})
