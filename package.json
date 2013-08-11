@@ -1,7 +1,7 @@
 {
 	"name": "amd-tools",
 	"description": "Diagnostic tools for projects using AMD modules",
-	"version": "1.0.0-alpha4",
+	"version": "1.0.0-alpha5",
 	"homepage": "https://github.com/zship/amd-tools",
 	"author": "Zach Shipley <zach@zachshipley.com>",
 	"repository": {
@@ -11,7 +11,8 @@
 	"license": "MIT",
 	"dependencies": {
 		"mout": "0.x",
-		"esprima": "1.x"
+		"esprima": "1.x",
+		"murmurhash-js": "0.0.1"
 	},
 	"devDependencies": {
 		"umdify": "0.x"

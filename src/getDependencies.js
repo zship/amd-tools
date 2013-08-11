@@ -8,11 +8,16 @@ define(function(require) {
 	var esprima = require('esprima');
 	var get = require('mout/object/get');
 
+	var memoize = require('./util/memoize');
 	var getDeps = require('./ast/getDependencies');
 	var normalize = require('./modules/normalize');
 
 
-	var getDependencies = function(file, rjsconfig) {
+	var getDependencies = memoize(function(file, rjsconfig) {
+		if (getDependencies.cache[file]) {
+			return getDependencies.cache[file];
+		}
+
 		rjsconfig = rjsconfig || {};
 		var deps = [];
 
@@ -33,10 +38,10 @@ define(function(require) {
 			})
 			.reverse()
 			.filter(function(name, i, list) {
-				return list.indexOf(name, i+1) === -1;
+				return name && list.indexOf(name, i+1) === -1;
 			})
 			.reverse();
-	};
+	});
 
 
 	return getDependencies;

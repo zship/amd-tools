@@ -3,25 +3,41 @@ define(function(require) {
 	'use strict';
 
 
+	var fs = require('fs');
 	var path = require('path');
 
-	var getDependencies = require('./getDependencies');
+	var esprima = require('esprima');
+	var get = require('mout/object/get');
+	var amdRequire = require('node-amd-require');
+
+	var getDependencies = require('./ast/getDependencies');
 	var resolve = require('./modules/resolve');
+	var normalize = require('./modules/normalize');
 
 
 	var _getPlugin = function(pluginName, dir, rjsconfig) {
-		var file = resolve(pluginName, dir, rjsconfig);
-		var plugin = require(file);
+		var plugin;
+
+		try {
+			var file = resolve(pluginName, dir, rjsconfig);
+			var state = amdRequire.save();
+			amdRequire(rjsconfig);
+			plugin = require(file);
+			amdRequire.restore(state);
+		}
+		catch(e) {
+			return;
+		}
 
 		if (!plugin || !plugin.load) {
-			throw '"' + pluginName + '" plugin could not be resolved';
+			return;
 		}
 
 		return plugin;
 	};
 
 
-	var _pluginCanLoad = function(plugin, loadArgs) {
+	var _pluginCanLoad = function(plugin, loadArgs, rjsconfig) {
 		var didLoad = false;
 		var load = function() {
 			didLoad = true;
@@ -31,7 +47,13 @@ define(function(require) {
 		};
 
 		try {
-			plugin.load(loadArgs, requirejs, load, {});
+			var state = amdRequire.save();
+			amdRequire(rjsconfig);
+			var cwd = process.cwd();
+			process.chdir(rjsconfig.baseUrl);
+			plugin.load(loadArgs, require, load, {});
+			process.chdir(cwd);
+			amdRequire.restore(state);
 		}
 		catch(e) {
 			return false;
@@ -42,12 +64,36 @@ define(function(require) {
 
 
 	var findBrokenDependencies = function(file, rjsconfig) {
-		return getDependencies(file)
-			.filter(function(declaredName) {
+		var deps = [];
+
+		try {
+			//can throw an Error if a module is not a valid AMD module
+			var ast = esprima.parse(fs.readFileSync(file, 'utf8'), {
+				loc: true,
+				range: true
+			});
+			deps = getDependencies(ast);
+		}
+		catch (e) {
+			//if it's shimmed, consider it a valid module and use shim deps
+			var id = normalize(file, rjsconfig);
+			deps = get(rjsconfig, 'shim.' + id + '.deps') || [];
+			deps = deps.map(function(name) {
+				return {
+					value: name,
+					shimmed: true
+				};
+			});
+		}
+
+		return deps
+			.filter(function(node) {
 				//ignore special 'require' dependency
-				return declaredName !== 'require';
+				return node.value !== 'require';
 			})
-			.map(function(declaredName) {
+			.map(function(node) {
+				var declaredName = node.value;
+
 				if (declaredName.search(/!/) !== -1) {
 					var rParts = /^(.*)!(.*)$/;
 					var parts = declaredName.match(rParts);
@@ -55,12 +101,9 @@ define(function(require) {
 					var pluginArgs = parts[2];
 
 					var plugin;
-					try {
-						plugin = _getPlugin(pluginName, path.dirname(file), rjsconfig);
-					}
-					catch(e) {
+					if (!(plugin = _getPlugin(pluginName, path.dirname(file), rjsconfig))) {
 						return {
-							parent: file,
+							ast: node,
 							declared: declaredName,
 							resolved: false,
 							type: 'plugin',
@@ -69,9 +112,9 @@ define(function(require) {
 						};
 					}
 
-					if (!_pluginCanLoad(plugin, pluginArgs)) {
+					if (!_pluginCanLoad(plugin, pluginArgs, rjsconfig)) {
 						return {
-							parent: file,
+							ast: node,
 							declared: declaredName,
 							resolved: false,
 							type: 'args',
@@ -81,7 +124,7 @@ define(function(require) {
 					}
 
 					return {
-						parent: file,
+						ast: node,
 						declared: declaredName,
 						resolved: resolve(pluginName, path.dirname(file), rjsconfig),
 						type: 'plugin',
@@ -90,12 +133,20 @@ define(function(require) {
 					};
 				}
 
-				return {
-					parent: file,
+				var dep = {
+					ast: node,
 					declared: declaredName,
 					resolved: resolve(declaredName, path.dirname(file), rjsconfig),
-					type: 'module'
 				};
+
+				if (node.shimmed) {
+					dep.type = 'shimmed';
+				}
+				else {
+					dep.type = 'module';
+				}
+
+				return dep;
 			})
 			.filter(function(dep) {
 				return !dep.resolved;

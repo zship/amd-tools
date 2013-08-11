@@ -3,63 +3,37 @@ define(function(require) {
 	'use strict';
 
 
-	var path = require('path');
-
-	var getDependencies = require('./getDependencies');
-	var resolve = require('./modules/resolve');
+	var getDependencyGraph = require('./getDependencyGraph');
 	var unique = require('./cycles/unique');
 
 
-	var _getResolvedDependencies = function(file, rjsconfig) {
-		return getDependencies(file, rjsconfig)
-			.filter(function(dep) {
-				return dep !== 'require';
-			})
-			.map(function(dep) {
-				return resolve(dep, path.dirname(file), rjsconfig);
-			});
-	};
+	var findCircularDependencies = function(file, rjsconfig) {
 
+		var cycles = [];
+		var graph = getDependencyGraph(file, rjsconfig);
 
-	var findCircularDependencies = function(pool, rjsconfig, depCache) {
-		depCache = depCache || (function() {
-			var ret = {};
-			pool.forEach(function(file) {
-				ret[file] = _getResolvedDependencies(file, rjsconfig);
-			});
-			return ret;
-		})();
-
-		var found = [];
-
-		/** @return Array<String> absolute file paths */
-		var collectCircular = function(file, graphPath) {
-			graphPath = graphPath || [];
-
-			var i = graphPath.indexOf(file);
-			if (i !== -1) {
-				found.push(graphPath.slice(i));
+		var visit = function(node, parents) {
+			var i;
+			if ((i = parents.indexOf(node)) !== -1) {
+				cycles.push(parents.slice(i));
 				return;
 			}
-			graphPath.push(file);
 
-			try {
-				depCache[file] = depCache[file] || _getResolvedDependencies(file, rjsconfig);
-			}
-			catch (e) {
-				throw new Error('Error getting dependencies for "' + file + '":\n' + e.message);
-			}
-
-			depCache[file].forEach(function(dep) {
-				collectCircular(dep, graphPath.slice());
+			node.deps.forEach(function(dep) {
+				visit(dep, parents.concat([node]));
 			});
 		};
 
-		pool.forEach(function(file) {
-			collectCircular(file, []);
-		});
+		visit(graph, []);
 
-		return unique(found);
+		return unique(
+			cycles.map(function(cycle) {
+				return cycle.map(function(node) {
+					return node.file;
+				});
+			})
+		);
+
 	};
 
 
