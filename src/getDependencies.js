@@ -28,7 +28,7 @@ define(function(require) {
 		}
 		catch (e) {
 			//if it's shimmed, consider it a valid module and use shim deps
-			var id = normalize(file, rjsconfig);
+			var id = normalize(rjsconfig, file);
 			deps = get(rjsconfig, 'shim.' + id + '.deps') || [];
 		}
 

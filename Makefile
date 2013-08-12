@@ -13,4 +13,7 @@ dist: $(DEST)
 clean:
 	rm -Rf dist/
 
+publish: clean dist
+	cd dist; npm publish
+
 .PHONY: all dist clean

@@ -8,14 +8,15 @@ define(function(require) {
 	var resolve = require('./resolve');
 
 
-	var normalize = function(file, rjsconfig) {
-		var baseUrl = rjsconfig.baseUrl;
-
-		if (file.indexOf('/') !== 0) {
-			file = resolve(file);
+	var normalize = function(rjsconfig, directory, file) {
+		if (arguments.length === 2) {
+			file = directory;
+			directory = '.';
 		}
 
-		var baseDirectory = path.resolve(baseUrl);
+		file = resolve(rjsconfig, directory, file);
+
+		var baseDirectory = path.resolve(rjsconfig.baseUrl);
 		var relativePath = path.relative(baseDirectory, file);
 
 		//combine all path transformation operations together

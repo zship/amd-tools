@@ -12,18 +12,24 @@ define(function(require) {
 	var memoize = require('../util/memoize');
 
 
-	var _resolve = function(declaredName, directory, rjsconfig) {
+	var ext = '.js';
+
+	var _resolve = function(rjsconfig, directory, declaredName) {
+		if (arguments.length === 2) {
+			declaredName = directory;
+			directory = '.';
+		}
+
+		// plugin
+		if (declaredName.indexOf('!') !== -1) {
+			return _resolve(rjsconfig, directory, declaredName.split('!')[0]);
+		}
+
 		// already absolute
 		if (declaredName.indexOf('/') === 0) {
 			return declaredName;
 		}
 
-		// plugin
-		if (declaredName.indexOf('!') !== -1) {
-			return _resolve(declaredName.split('!')[0], directory, rjsconfig);
-		}
-
-		var ext = '.js';
 		declaredName = declaredName.replace(ext, '');
 
 		// (explicitly) relative paths
@@ -68,13 +74,13 @@ define(function(require) {
 	};
 
 
-	var resolve = memoize(function(declaredName, directory, rjsconfig) {
-		var file = _resolve(declaredName, directory, rjsconfig);
+	var resolve = memoize(function(rjsconfig, directory, declaredName) {
+		var file = _resolve(rjsconfig, directory, declaredName);
 		if (!fs.existsSync(file)) {
 			return;
 		}
 		return file;
-	}, function hash(declaredName, directory, rjsconfig) {
+	}, function hash(rjsconfig, directory, declaredName) {
 		if (declaredName.search(/^\.+\//) !== -1) {
 			return directory + '|' + declaredName;
 		}

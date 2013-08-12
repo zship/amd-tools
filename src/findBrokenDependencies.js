@@ -19,7 +19,7 @@ define(function(require) {
 		var plugin;
 
 		try {
-			var file = resolve(pluginName, dir, rjsconfig);
+			var file = resolve(rjsconfig, dir, pluginName);
 			var state = amdRequire.save();
 			amdRequire(rjsconfig);
 			plugin = require(file);
@@ -76,7 +76,7 @@ define(function(require) {
 		}
 		catch (e) {
 			//if it's shimmed, consider it a valid module and use shim deps
-			var id = normalize(file, rjsconfig);
+			var id = normalize(rjsconfig, file);
 			deps = get(rjsconfig, 'shim.' + id + '.deps') || [];
 			deps = deps.map(function(name) {
 				return {
@@ -126,7 +126,7 @@ define(function(require) {
 					return {
 						ast: node,
 						declared: declaredName,
-						resolved: resolve(pluginName, path.dirname(file), rjsconfig),
+						resolved: resolve(rjsconfig, path.dirname(file), pluginName),
 						type: 'plugin',
 						pluginName: pluginName,
 						pluginArgs: pluginArgs
@@ -136,7 +136,7 @@ define(function(require) {
 				var dep = {
 					ast: node,
 					declared: declaredName,
-					resolved: resolve(declaredName, path.dirname(file), rjsconfig),
+					resolved: resolve(rjsconfig, path.dirname(file), declaredName),
 				};
 
 				if (node.shimmed) {

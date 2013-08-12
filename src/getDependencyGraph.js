@@ -30,7 +30,7 @@ define(function(require) {
 					return dep !== 'require' && (dep.search(/:\/\//) === -1);
 				})
 				.map(function(dep) {
-					var resolved = resolve(dep, path.dirname(file), rjsconfig);
+					var resolved = resolve(rjsconfig, path.dirname(file), dep);
 					if (!resolved) {
 						throw new Error('Could not resolve dependency "' + dep + '" from file "' + file + '"');
 					}
