@@ -15,11 +15,6 @@ define(function(require) {
 	var ext = '.js';
 
 	var _resolve = function(rjsconfig, directory, declaredName) {
-		if (arguments.length === 2) {
-			declaredName = directory;
-			directory = '.';
-		}
-
 		// plugin
 		if (declaredName.indexOf('!') !== -1) {
 			return _resolve(rjsconfig, directory, declaredName.split('!')[0]);
@@ -75,12 +70,22 @@ define(function(require) {
 
 
 	var resolve = memoize(function(rjsconfig, directory, declaredName) {
+		if (arguments.length === 2) {
+			declaredName = directory;
+			directory = '.';
+		}
+
 		var file = _resolve(rjsconfig, directory, declaredName);
 		if (!fs.existsSync(file)) {
 			return;
 		}
 		return file;
 	}, function hash(rjsconfig, directory, declaredName) {
+		if (arguments.length === 2) {
+			declaredName = directory;
+			directory = '.';
+		}
+
 		if (declaredName.search(/^\.+\//) !== -1) {
 			return directory + '|' + declaredName;
 		}

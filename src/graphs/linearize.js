@@ -3,7 +3,8 @@ define(function(require) {
 	'use strict';
 
 
-	var topologicalSort = function(nodes) {
+	// topological sort
+	var linearize = function(nodes) {
 
 		var sorted = [];
 
@@ -13,7 +14,7 @@ define(function(require) {
 			}
 
 			if (parents.indexOf(node) !== -1) {
-				throw new Error('Cycle detected');
+				return; // cycle
 			}
 
 			node.deps.forEach(function(dep) {
@@ -32,6 +33,6 @@ define(function(require) {
 	};
 
 
-	return topologicalSort;
+	return linearize;
 
 });

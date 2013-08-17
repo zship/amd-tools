@@ -7,14 +7,15 @@ define(function(require) {
 
 
 	var unique = function(loops) {
-		return loops.filter(function(loop, i) {
-			return !loops.some(function hasDupe(otherLoop, j) {
-				if (j >= i) {
-					return false;
-				}
-				return equal(loop, otherLoop);
+		return loops
+			.filter(function(loop) {
+				return loop && loop.length;
+			})
+			.filter(function(loop, i, loopsCopy) {
+				return loopsCopy.slice(0, i).every(function hasDupe(loop2, j) {
+					return !equal(loop, loop2);
+				});
 			});
-		});
 	};
 
 
