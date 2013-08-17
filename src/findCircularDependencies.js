@@ -7,10 +7,10 @@ define(function(require) {
 	var unique = require('./cycles/unique');
 
 
-	var findCircularDependencies = function(file, rjsconfig) {
+	var findCircularDependencies = function(rjsconfig, file) {
 
 		var cycles = [];
-		var graph = getDependencyGraph(file, rjsconfig);
+		var graph = getDependencyGraph(rjsconfig, file);
 
 		var visit = function(node, parents) {
 			var i;

@@ -9,7 +9,7 @@ define(function(require) {
 	var resolve = require('./modules/resolve');
 
 
-	var getDependencyGraph = function(file, rjsconfig) {
+	var getDependencyGraph = function(rjsconfig, file) {
 
 		var visited = {};
 
@@ -25,7 +25,7 @@ define(function(require) {
 
 			visited[file] = node;
 
-			getDependencies(file, rjsconfig)
+			getDependencies(rjsconfig, file)
 				.filter(function(dep) {
 					return dep !== 'require' && (dep.search(/:\/\//) === -1);
 				})

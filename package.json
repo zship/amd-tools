@@ -1,12 +1,12 @@
 {
-	"name": "amd-tools",
-	"description": "Diagnostic tools for projects using AMD modules",
-	"version": "1.0.0-alpha6",
-	"homepage": "https://github.com/zship/amd-tools",
+	"name": "libamd",
+	"description": "Library for working with the Asynchronous Module Definition format",
+	"version": "1.0.0-rc.1",
+	"homepage": "https://github.com/zship/libamd",
 	"author": "Zach Shipley <zach@zachshipley.com>",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/zship/amd-tools"
+		"url": "https://github.com/zship/libamd"
 	},
 	"license": "MIT",
 	"dependencies": {

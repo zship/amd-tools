@@ -13,7 +13,7 @@ define(function(require) {
 	var normalize = require('./modules/normalize');
 
 
-	var getDependencies = memoize(function(file, rjsconfig) {
+	var getDependencies = memoize(function(rjsconfig, file) {
 		if (getDependencies.cache[file]) {
 			return getDependencies.cache[file];
 		}

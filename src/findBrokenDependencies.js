@@ -63,7 +63,7 @@ define(function(require) {
 	};
 
 
-	var findBrokenDependencies = function(file, rjsconfig) {
+	var findBrokenDependencies = function(rjsconfig, file) {
 		var deps = [];
 
 		try {

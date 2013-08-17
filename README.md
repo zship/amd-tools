@@ -1,5 +1,5 @@
-amd-tools
-=========
+libamd
+======
 
 License
 -------
