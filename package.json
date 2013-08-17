@@ -12,7 +12,8 @@
 	"dependencies": {
 		"mout": "0.x",
 		"esprima": "1.x",
-		"murmurhash-js": "0.0.1"
+		"murmurhash-js": "0.0.1",
+		"node-amd-require": "0.x"
 	},
 	"devDependencies": {
 		"umdify": "0.x"

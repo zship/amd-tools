@@ -51,6 +51,12 @@ define(function(require) {
 			amdRequire(rjsconfig);
 			var cwd = process.cwd();
 			process.chdir(rjsconfig.baseUrl);
+			require.toUrl = function(name) {
+				if (name && name.indexOf('.') === 0) {
+					return path.resolve(rjsconfig.baseUrl, name);
+				}
+				return path.resolve(name);
+			};
 			plugin.load(loadArgs, require, load, {});
 			process.chdir(cwd);
 			amdRequire.restore(state);
