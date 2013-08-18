@@ -3,13 +3,13 @@ define(function(require) {
 	'use strict';
 
 
-	var traverse = require('./_traverse');
+	var traverse = require('estraverse').traverse;
 
 
 	var getCjsDependencies = function(ast) {
 		var deps = [];
 
-		traverse(ast, function(node) {
+		traverse(ast, { enter: function(node) {
 			if (
 				node &&
 				node.type === 'CallExpression' &&
@@ -22,7 +22,7 @@ define(function(require) {
 			) {
 				deps.push(node['arguments'][0]);
 			}
-		});
+		}});
 
 		return deps;
 	};

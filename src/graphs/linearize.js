@@ -3,8 +3,15 @@ define(function(require) {
 	'use strict';
 
 
+	var isArray = require('mout/lang/isArray');
+
+
 	// topological sort
 	var linearize = function(nodes) {
+
+		if (!isArray(nodes)) {
+			nodes = [nodes];
+		}
 
 		var sorted = [];
 

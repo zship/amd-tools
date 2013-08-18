@@ -5,8 +5,9 @@ define(function(require) {
 
 	var fs = require('fs');
 
-	var esprima = require('esprima');
+	var acorn = require('acorn');
 	var get = require('mout/object/get');
+	var mixin = require('mout/object/mixIn');
 
 	var memoize = require('./util/memoize');
 	var getDeps = require('./ast/getDependencies');
@@ -23,24 +24,32 @@ define(function(require) {
 
 		try {
 			//can throw an Error if a module is not a valid AMD module
-			var ast = esprima.parse(fs.readFileSync(file, 'utf8'));
+			var ast = acorn.parse(fs.readFileSync(file, 'utf8'));
 			deps = getDeps(ast);
 		}
 		catch (e) {
 			//if it's shimmed, consider it a valid module and use shim deps
 			var id = normalize(rjsconfig, file);
 			deps = get(rjsconfig, 'shim.' + id + '.deps') || [];
+			deps = deps.map(function(name) {
+				return {
+					value: name,
+					shimmed: true
+				};
+			});
 		}
 
 		return deps
 			.map(function(node) {
-				return node.value;
+				return mixin({
+					name: node.value
+				}, node);
 			})
-			.reverse()
-			.filter(function(name, i, list) {
-				return name && list.indexOf(name, i+1) === -1;
-			})
-			.reverse();
+			.filter(function(dep, i, list) {
+				return dep.name && list.slice(0, i).every(function(dep2) {
+					return dep.name !== dep2.name;
+				});
+			});
 	});
 
 

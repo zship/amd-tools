@@ -6,7 +6,7 @@ define(function(require) {
 
 	var fs = require('fs');
 
-	var esprima = require('esprima');
+	var acorn = require('acorn');
 	var map = require('mout/object/map');
 	var isArray = require('mout/lang/isArray');
 
@@ -48,9 +48,7 @@ define(function(require) {
 
 		var ast;
 		try {
-			ast = esprima.parse(contents, {
-				range: true
-			});
+			ast = acorn.parse(contents);
 		}
 		catch(e) {
 			throw new Error('Could not parse AMD config "' + contents + '"');
@@ -62,7 +60,7 @@ define(function(require) {
 			return;
 		}
 
-		var config = contents.substring(node.range[0], node.range[1]);
+		var config = contents.substring(node.start, node.end);
 		return _normalize(eval('(' + config + ')'));
 	};
 

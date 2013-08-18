@@ -27,14 +27,21 @@ define(function(require) {
 
 			getDependencies(rjsconfig, file)
 				.filter(function(dep) {
-					return dep !== 'require' && (dep.search(/:\/\//) === -1);
+					return dep.name !== 'require' && (dep.name.search(/:\/\//) === -1);
 				})
 				.map(function(dep) {
-					var resolved = resolve(rjsconfig, path.dirname(file), dep);
+					var resolved = resolve(rjsconfig, path.dirname(file), dep.name);
 					if (!resolved) {
-						throw new Error('Could not resolve dependency "' + dep + '" from file "' + file + '"');
+						// node.js dependency? we won't be able to trace deeper.
+						if (require.resolve(dep.name)) {
+							return;
+						}
+						throw new Error('Could not resolve dependency "' + dep.name + '" from file "' + file + '"');
 					}
 					return resolved;
+				})
+				.filter(function(dep) {
+					return !!dep;
 				})
 				.forEach(function(dep) {
 					node.deps.push(graph(dep));

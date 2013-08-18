@@ -3,13 +3,14 @@ define(function(require) {
 	'use strict';
 
 
-	var traverse = require('./_traverse');
+	var traverse = require('estraverse').traverse;
+	var SKIP = require('estraverse').VisitorOption.Skip;
 
 
 	var getDefine = function(ast) {
 		var defines = [];
 
-		traverse(ast, function(node) {
+		traverse(ast, { enter: function(node) {
 			if (
 				node &&
 				node.type === 'ExpressionStatement' &&
@@ -18,8 +19,9 @@ define(function(require) {
 				node.expression.callee.name === 'define'
 			) {
 				defines.push(node);
+				return SKIP;
 			}
-		});
+		}});
 
 		if (!defines.length) {
 			throw new Error('AMD modules must contain a define() call');

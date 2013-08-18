@@ -6,13 +6,10 @@ define(function(require) {
 	var fs = require('fs');
 	var path = require('path');
 
-	var esprima = require('esprima');
-	var get = require('mout/object/get');
 	var amdRequire = require('node-amd-require');
 
-	var getDependencies = require('./ast/getDependencies');
+	var getDependencies = require('./getDependencies');
 	var resolve = require('./modules/resolve');
-	var normalize = require('./modules/normalize');
 
 
 	var _getPlugin = function(pluginName, dir, rjsconfig) {
@@ -51,17 +48,29 @@ define(function(require) {
 			amdRequire(rjsconfig);
 			var cwd = process.cwd();
 			process.chdir(rjsconfig.baseUrl);
+			// optimization: if require.toUrl is used by the plugin, assume
+			// compilation will follow and exit early if the path is valid
 			require.toUrl = function(name) {
+				var resolved;
 				if (name && name.indexOf('.') === 0) {
-					return path.resolve(rjsconfig.baseUrl, name);
+					resolved = path.resolve(rjsconfig.baseUrl, name);
 				}
-				return path.resolve(name);
+				resolved = path.resolve(name);
+				if (fs.existsSync(resolved)) {
+					throw 'pass';
+				}
+				else {
+					throw 'fail';
+				}
 			};
 			plugin.load(loadArgs, require, load, {});
 			process.chdir(cwd);
 			amdRequire.restore(state);
 		}
 		catch(e) {
+			if (e === 'pass') {
+				return true;
+			}
 			return false;
 		}
 
@@ -70,29 +79,7 @@ define(function(require) {
 
 
 	var findBrokenDependencies = function(rjsconfig, file) {
-		var deps = [];
-
-		try {
-			//can throw an Error if a module is not a valid AMD module
-			var ast = esprima.parse(fs.readFileSync(file, 'utf8'), {
-				loc: true,
-				range: true
-			});
-			deps = getDependencies(ast);
-		}
-		catch (e) {
-			//if it's shimmed, consider it a valid module and use shim deps
-			var id = normalize(rjsconfig, file);
-			deps = get(rjsconfig, 'shim.' + id + '.deps') || [];
-			deps = deps.map(function(name) {
-				return {
-					value: name,
-					shimmed: true
-				};
-			});
-		}
-
-		return deps
+		return getDependencies(rjsconfig, file)
 			.filter(function(node) {
 				//ignore special 'require' dependency
 				return node.value !== 'require';

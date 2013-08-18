@@ -1,7 +1,7 @@
 {
 	"name": "libamd",
 	"description": "Library for working with the Asynchronous Module Definition format",
-	"version": "1.0.0-rc.1",
+	"version": "1.0.0-rc.2",
 	"homepage": "https://github.com/zship/libamd",
 	"author": "Zach Shipley <zach@zachshipley.com>",
 	"repository": {
@@ -11,7 +11,8 @@
 	"license": "MIT",
 	"dependencies": {
 		"mout": "0.x",
-		"esprima": "1.x",
+		"acorn": "0.x",
+		"estraverse": "1.3.x",
 		"murmurhash-js": "0.0.1",
 		"node-amd-require": "0.x"
 	},

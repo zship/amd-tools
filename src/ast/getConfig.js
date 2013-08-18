@@ -3,7 +3,8 @@ define(function(require) {
 	'use strict';
 
 
-	var traverse = require('./_traverse');
+	var traverse = require('estraverse').traverse;
+	var BREAK = require('estraverse').VisitorOption.Break;
 
 
 	var _isRequireCall = function(node) {
@@ -49,7 +50,7 @@ define(function(require) {
 
 	// var require = {}
 	// var requirejs = {}
-	var _getRequireAssignment = function(node) {
+	var _isRequireAssignment = function(node) {
 		if (
 			node.id &&
 			node.id.type === 'Identifier' &&
@@ -60,23 +61,26 @@ define(function(require) {
 			node.init &&
 			node.init.type === 'ObjectExpression'
 		) {
-			return node.init;
+			return true;
 		}
+
+		return false;
 	};
 
 
 	var getConfig = function(ast) {
 		var config;
 
-		traverse(ast, function(node) {
+		traverse(ast, { enter: function(node) {
 			if (_isRequireCall(node)) {
 				config = node['arguments'] && node['arguments'][0];
-				return false;
+				return BREAK;
 			}
-			else if ((config = _getRequireAssignment(node))) {
-				return false;
+			if (_isRequireAssignment(node)) {
+				config = node.init;
+				return BREAK;
 			}
-		});
+		}});
 
 		return config;
 	};
