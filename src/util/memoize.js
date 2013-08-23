@@ -6,6 +6,7 @@ define(function(require) {
 	var murmur = require('murmurhash-js');
 	var isObject = require('mout/lang/isObject');
 	var isArray = require('mout/lang/isArray');
+	var seed = new Date().getTime();
 
 
 	var memoize = function(fn, hashFn) {
@@ -20,7 +21,7 @@ define(function(require) {
 					key += args[i].toString();
 				}
 			}
-			return murmur.murmur3(key);
+			return murmur(key, seed);
 		};
 
 		var memoized = function() {
