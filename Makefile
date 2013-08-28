@@ -16,4 +16,4 @@ clean:
 publish: clean dist
 	cd dist; npm publish
 
-.PHONY: all dist clean
+.PHONY: all dist clean publish
