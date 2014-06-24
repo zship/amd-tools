@@ -16,6 +16,7 @@ define(function(require) {
 		var graph = function(file) {
 			var node = {
 				file: file,
+				resolved: true,
 				deps: []
 			};
 
@@ -32,11 +33,13 @@ define(function(require) {
 				.map(function(dep) {
 					var resolved = resolve(rjsconfig, path.dirname(file), dep.name);
 					if (!resolved) {
-						// node.js dependency? we won't be able to trace deeper.
-						if (require.resolve(dep.name)) {
-							return;
-						}
-						throw new Error('Could not resolve dependency "' + dep.name + '" from file "' + file + '"');
+						// can't resolve the file? we won't be able to trace deeper.
+						node.deps.push({
+							file: '??/' + dep.name,
+							resolved: false,
+							deps: []
+						});
+						return;
 					}
 					return resolved;
 				})
