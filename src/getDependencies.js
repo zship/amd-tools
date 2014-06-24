@@ -5,7 +5,7 @@ define(function(require) {
 
 	var fs = require('fs');
 
-	var acorn = require('acorn');
+	var acorn = require('acorn/acorn_loose');
 	var get = require('mout/object/get');
 	var mixin = require('mout/object/mixIn');
 
@@ -24,7 +24,7 @@ define(function(require) {
 
 		try {
 			//can throw an Error if a module is not a valid AMD module
-			var ast = acorn.parse(fs.readFileSync(file, 'utf8'));
+			var ast = acorn.parse_dammit(fs.readFileSync(file, 'utf8'));
 			deps = getDeps(ast);
 		}
 		catch (e) {
