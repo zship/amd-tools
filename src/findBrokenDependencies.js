@@ -43,10 +43,10 @@ define(function(require) {
 			didLoad = true;
 		};
 
+		var cwd = process.cwd();
+		var state = amdRequire.save();
 		try {
-			var state = amdRequire.save();
 			amdRequire(rjsconfig);
-			var cwd = process.cwd();
 			process.chdir(rjsconfig.baseUrl);
 			// optimization: if require.toUrl is used by the plugin, assume
 			// compilation will follow and exit early if the path is valid
@@ -68,6 +68,8 @@ define(function(require) {
 			amdRequire.restore(state);
 		}
 		catch(e) {
+			process.chdir(cwd);
+			amdRequire.restore(state);
 			if (e === 'pass') {
 				return true;
 			}
